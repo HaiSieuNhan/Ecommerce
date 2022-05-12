@@ -1,6 +1,6 @@
 ﻿using Ecommerce.Data;
 using Ecommerce.Models.Request;
-using Ecommerce.Models.Request.User;
+using Ecommerce.Models.Request.Order;
 using Ecommerce.Service;
 using Ecommerce.Shared;
 using Ecommerce.Shared.Model;
@@ -12,58 +12,35 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Controllers
 {
-    [Microsoft.AspNetCore.Components.Route("api/users")]
+    [Microsoft.AspNetCore.Components.Route("api/order")]
     [ApiController]
     [AuthorizationAttribute]
-    public class UsersController
+    public class OrderController
     {
-        private IUserServices _userServices;
-        public UsersController(IUserServices userServices)
+        private readonly IOrderServices _orderServices;
+        public OrderController(IOrderServices orderServices)
         {
-            _userServices = userServices;
+            _orderServices = orderServices;
         }
 
-        [HttpPost("login")]
-        public async Task<ApiResponse<string>> Login([FromBody] LoginRequest request)
+        [HttpPost("create-order")]
+        public async Task<ApiResponse<string>> Create([FromBody] CreateOrder request)
         {
             try
             {
-                var login = _userServices.Login(request.Username, request.Password);
-
-                return new ApiResponse<string>
-                {
-                    Status = 1,
-                    Data = login.Data
-                };
-            }
-            catch (System.Exception ex)
-            {
-                return new ApiResponse<string>
-                {
-                    Status = 0,
-                    Data = "Có lỗi xảy ra trong quá trình xử lý"
-                };
-            }
-        }
-
-        [HttpPost("create")]
-        public async Task<ApiResponse<string>> Create([FromBody] CreateUser request)
-        {
-            try
-            {
-                var userProfile = new UserProfile()
+                var order = new Order()
                 {
                     Name = request.Name,
-                    UserName = request.UserName,
-                    PassWord = request.PassWord,
-                    Address = request.Address
+                    UserId = request.UserId,
+                    ProductId = request.ProductId,
+                    Amount = request.Amount,
+                    OrderDate = request.OrderDate,
                 };
 
-                var resultValid = _userServices.ValidDataCreate(userProfile);
+                var resultValid = _orderServices.ValidDataCreate(order);
                 if (resultValid.Status == 1)
                 {
-                    userProfile.PassWord = Helper.HashPassword(request.PassWord);
-                    _userServices.Add(userProfile);
+                   await _orderServices.Add(order);
                 }
                 else
                 {
@@ -90,17 +67,17 @@ namespace Ecommerce.Controllers
             }
         }
 
-        [HttpGet("get-all")]
+        [HttpGet("get-all-order")]
         public async Task<ApiResponse<List<UserProfile>>> GetAll()
         {
             try
             {
-                var result = _userServices.GetAll();
+                var result = _orderServices.GetAll();
 
                 return new ApiResponse<List<UserProfile>>
                 {
                     Status = 1,
-                    Data = result
+                   // Data = result
                 };
             }
             catch (System.Exception ex)
@@ -113,24 +90,24 @@ namespace Ecommerce.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ApiResponse<UserProfile>> GetDetails(string id)
+        [HttpGet("get-detail-order-by-{id}")]
+        public async Task<ApiResponse<Order>> GetDetails(string id)
         {
             try
             {
-                var userId = Guid.Parse(id);
+                var orderId = Guid.Parse(id);
 
-                var user = _userServices.GetUserById(userId);
+                var order = _orderServices.GetOrderById(orderId);
 
-                return new ApiResponse<UserProfile>
+                return new ApiResponse<Order>
                 {
                     Status = 1,
-                    Data = user
+                    Data = order
                 };
             }
             catch (System.Exception ex)
             {
-                return new ApiResponse<UserProfile>
+                return new ApiResponse<Order>
                 {
                     Status = 0,
                     Msg = "Có lỗi xảy ra trong quá trình xử lý"

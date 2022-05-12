@@ -1,3 +1,5 @@
+using CRUD_MongoDb_API.Entities;
+using Ecommerce.Service;
 using Ecommerce.Shared;
 using Ecommerce.Shared.Caching;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +28,10 @@ namespace Ecommerce
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // requires using Microsoft.Extensions.Options
+            services.Configure<ApplicationDatabaseSettings>(
+                Configuration.GetSection(nameof(ApplicationDatabaseSettings)));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Ecommerce CLOUD API", Version = "v1" });
@@ -56,7 +62,7 @@ namespace Ecommerce
             });
             services.AddControllers();
             services.AddMemoryCache();
-            services.AddSingleton<ICachingService, CachingService>();
+            ConfigureServies(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -92,6 +98,15 @@ namespace Ecommerce
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void ConfigureServies(IServiceCollection services)
+        {
+            services.AddSingleton<ICachingService, CachingService>();
+            services.AddSingleton<IUserServices, UserServices>();
+            services.AddSingleton<ICategoryServices, CategoryServices>();
+            services.AddSingleton<IProductServices, ProductServices>();
+            services.AddSingleton<IOrderServices, OrderServices>();
         }
     }
 }
