@@ -2,6 +2,7 @@
 using Ecommerce.Models.Request;
 using Ecommerce.Models.Request.Order;
 using Ecommerce.Service;
+using Ecommerce.Service.Model;
 using Ecommerce.Shared;
 using Ecommerce.Shared.Model;
 using Microsoft.AspNetCore.Components;
@@ -67,14 +68,14 @@ namespace Ecommerce.Controllers
             }
         }
 
-        [HttpGet("get-all-order")]
-        public async Task<ApiResponse<List<UserProfile>>> GetAll()
+        [HttpPost("get-all-order")]
+        public async Task<ApiResponse<Paged<OrderViewModel>>> GetAll([FromBody] SearchOrder searchOrder)
         {
             try
             {
-                var result = _orderServices.GetAll();
+                var result = _orderServices.GetAll(searchOrder);
 
-                return new ApiResponse<List<UserProfile>>
+                return new ApiResponse<Paged<OrderViewModel>>
                 {
                     Status = 1,
                    // Data = result
@@ -82,7 +83,7 @@ namespace Ecommerce.Controllers
             }
             catch (System.Exception ex)
             {
-                return new ApiResponse<List<UserProfile>>
+                return new ApiResponse<Paged<OrderViewModel>>
                 {
                     Status = 0,
                     Msg = "Có lỗi xảy ra trong quá trình xử lý"

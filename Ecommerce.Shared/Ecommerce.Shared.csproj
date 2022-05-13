@@ -13,4 +13,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Ecommerce.Data\Ecommerce.Data.csproj" />
+  </ItemGroup>
+
 </Project>

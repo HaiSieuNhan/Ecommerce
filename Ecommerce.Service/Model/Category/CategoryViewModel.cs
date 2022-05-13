@@ -1,16 +1,15 @@
 ﻿using Ecommerce.Shared;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace Ecommerce.Service.Model
+namespace Ecommerce.Service.Model.Category
 {
-    public class OrderViewModel
+    public class CategoryViewModel
     {
         public Guid ProductId { get; set; }
         public string ProductName { get; set; }
-        public Guid? CategorytId { get; set; }
+        public Guid CategorytId { get; set; }
         public string CategoryName { get; set; }
         public Guid UserId { get; set; }
         public string NameUser { get; set; }
@@ -18,10 +17,10 @@ namespace Ecommerce.Service.Model
         public int Amount { get; set; }
     }
 
-    public class SearchOrder : Paging
+    public class SearchCategory : Paging
     {
         public string KeyWord { get; set; }
 
-        public bool IsSortProductNameDesc { get; set; } = true;
+        public bool IsSortDesc { get; set; } = true;
     }
 }

@@ -6,6 +6,7 @@ using Ecommerce.Shared;
 using Ecommerce.Shared.Model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -38,6 +39,8 @@ namespace Ecommerce.Controllers
             }
             catch (System.Exception ex)
             {
+
+               await LoggerException.LogError(ex, "login", string.Empty);
                 return new ApiResponse<string>
                 {
                     Status = 0,
@@ -82,6 +85,7 @@ namespace Ecommerce.Controllers
             }
             catch (System.Exception ex)
             {
+                await LoggerException.LogError(ex, "login", JsonConvert.SerializeObject(request));
                 return new ApiResponse<string>
                 {
                     Status = 0,
