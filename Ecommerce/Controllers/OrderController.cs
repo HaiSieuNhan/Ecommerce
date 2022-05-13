@@ -78,7 +78,7 @@ namespace Ecommerce.Controllers
                 return new ApiResponse<Paged<OrderViewModel>>
                 {
                     Status = 1,
-                   // Data = result
+                    Data = result
                 };
             }
             catch (System.Exception ex)

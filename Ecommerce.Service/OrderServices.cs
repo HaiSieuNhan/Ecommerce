@@ -51,15 +51,11 @@ namespace Ecommerce.Service
         {
             var orderDb = _orderCollection.Find(x => x.IsDeleted == 0).ToList().AsQueryable();
             var dicUser = _userServices.GetAll().ToDictionary(x => x.Id, x => x.Name);
-            var dicProduct = _productServices.GetAll().ToDictionary(x => x.Id, x => x);
             var dicCategory = _categoryServices.GetAll().ToDictionary(x => x.Id, x => x.Name);
 
-            // paging
-            var paged = new Paged<Order>(orderDb, request);
-            var result = paged.Convert<OrderViewModel>();
             var orderModels = new List<OrderViewModel>();
 
-            foreach (var data in paged.Data)
+            foreach (var data in orderDb)
             {
                 var product = _productServices.GetProductById(data.ProductId);
 
@@ -76,6 +72,12 @@ namespace Ecommerce.Service
                 });
             }
 
+            if (!string.IsNullOrEmpty(request.KeyWord))
+            {
+                var keyWord = request.KeyWord.ToLower().Trim();
+                orderModels = orderModels.Where(x => x.ProductName.ToLower().Trim().Contains(keyWord)).ToList();
+            }
+
             if (!request.IsSortProductNameDesc)
             {
                 orderModels = orderModels.OrderBy(x => x.ProductName).ToList();
@@ -85,10 +87,19 @@ namespace Ecommerce.Service
                 orderModels = orderModels.OrderByDescending(x => x.ProductName).ToList();
             }
 
-            result.Data = orderModels;
-
+            // paging
+            var paged = new Paged<OrderViewModel>(orderModels, request);
+            var result = paged.Convert<OrderViewModel>();
+            result.Data = paged.Data;
             return result;
-        } 
+        }
+
+        public static Func<IQueryable<T>, IQueryable<T>> Page<T>(int pageAt = 1, int pageSize = 20)
+        {
+            var myPage = pageAt < 1 ? 1 : pageAt;
+            var myPageSize = pageSize <= 0 ? 20 : pageSize;
+            return source => source.Skip((myPage - 1) * pageSize).Take(myPageSize);
+        }
 
         public Order GetOrderById(Guid orderId)
         {
